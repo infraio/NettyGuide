@@ -61,10 +61,9 @@ public class MultiplexerTimeServer implements Runnable {
           } catch (Exception e) {
             System.out.println("Got exception when handle input");
             e.printStackTrace();
-          } finally {
             if (key != null) {
               key.cancel();
-              if (key.channel() != null && key.channel() instanceof SocketChannel) {
+              if (key.channel() != null) {
                 key.channel().close();
               }
             }
@@ -94,7 +93,6 @@ public class MultiplexerTimeServer implements Runnable {
         ServerSocketChannel ssc = (ServerSocketChannel) key.channel();
         SocketChannel sc = ssc.accept();
         sc.configureBlocking(false);
-        sc.socket().setReuseAddress(true);
         // step7 : 注册SocketChannel到Selector，并监听READ事件
         sc.register(selector, SelectionKey.OP_READ);
       } else if (key.isReadable()) {
@@ -112,24 +110,12 @@ public class MultiplexerTimeServer implements Runnable {
           String response = body.equalsIgnoreCase("Query Time")
               ? new Date(System.currentTimeMillis()).toString() : "Bad Order";
           // step10 : 将response返回给Client
-          respond(sc, response);
+          ByteBuffer writeBuffer = ByteBuffer.wrap(response.getBytes());
+          sc.write(writeBuffer);
         } else if (readBytes < 0) {
           key.cancel();
           sc.close();
         }
-      }
-    }
-  }
-  
-  private void respond(SocketChannel channel, String response) throws IOException {
-    if (response != null && response.trim().length() > 0) {
-      byte[] bytes = response.getBytes();
-      ByteBuffer writeBuffer = ByteBuffer.allocate(bytes.length);
-      writeBuffer.put(bytes);
-      writeBuffer.flip();
-      int writeBytes = 0;
-      while (writeBytes < bytes.length) {
-        writeBytes += channel.write(writeBuffer);
       }
     }
   }
