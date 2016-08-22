@@ -7,27 +7,26 @@ import io.netty.channel.ChannelInboundHandlerAdapter;
 
 public class TimeClientHandler extends ChannelInboundHandlerAdapter {
 
-  private final ByteBuf request;
+  private final byte[] request;
+  private int counter;
 
   public TimeClientHandler() {
-    byte[] bytes = "Query Time".getBytes();
-    request = Unpooled.buffer(bytes.length);
-    request.writeBytes(bytes);
-    System.out.println("Send order to server");
+    request = ("Query Time" + System.getProperty("line.separator")).getBytes();
   }
 
   @Override
   public void channelActive(ChannelHandlerContext ctx) throws Exception {
-    ctx.writeAndFlush(request);
+    for (int i = 0; i < 100; i++) {
+      ByteBuf message = Unpooled.buffer(request.length);
+      message.writeBytes(request);
+      ctx.writeAndFlush(message);
+    }
   }
 
   @Override
   public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
-    ByteBuf buf = (ByteBuf) msg;
-    byte[] response = new byte[buf.readableBytes()];
-    buf.readBytes(response);
-    String body = new String(response, "UTF-8").trim();
-    System.out.println("Now is " + body);
+    String body = (String) msg;
+    System.out.println("Now is " + body + " ; the counter is " + ++counter);
   }
 
   @Override
