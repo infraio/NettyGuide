@@ -4,5 +4,6 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="lib" path="/home/xiaohao/open_source/netty-4.1.4.Final/jar/all-in-one/netty-all-4.1.4.Final-sources.jar"/>
 	<classpathentry kind="lib" path="/home/xiaohao/open_source/netty-4.1.4.Final/jar/all-in-one/netty-all-4.1.4.Final.jar"/>
+	<classpathentry kind="lib" path="/home/xiaohao/protobuf-2.5.0/java/target/protobuf-java-2.5.0.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
